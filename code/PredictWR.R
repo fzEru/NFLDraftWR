@@ -50,13 +50,27 @@ WR.1$extraDR[WR.1$extraDR == "Yes"] <- 1
 
 WR.1$top12pt <- WR.1$top12 / WR.1$seasons
 WR.1$top24pt <- WR.1$top24 / WR.1$seasons
-WR.1$PredictedrTargets <- linear_rTargets(WR.1$DR, WR.1$TS, WR.1$BA)
+WR.1$predicted_rTargets <- linear_rTargets(WR.1$DR, WR.1$TS, WR.1$BA, WR.1$RAS, WR.1$cluster, WR.1$pick)
+WR.1$targetBinary <- WR.1$rTargets > WR.1$predicted_rTargets
+WR.1$targetComparison <- WR.1$rTargets - WR.1$predicted_rTargets
+
+#subset for analysis
+
+test_rTargets <- subset(WR.1, select = c('Player',
+                                'rTargets',
+                                'predicted_rTargets',
+                                'targetBinary',
+                                'targetComparison',
+                                'top12pt',
+                                'top24pt',
+                                'cluster'))
 
 WR.2 <- subset(WR.1, seasons != 0)
 
 WR.1num <- subset(WR.1, select = c('DR',
                                    'TS', 
-                                   'BA'))
+                                   'BA', 
+                                   'RAS'))
 c('DR') %in% colnames(WR.1num)
 
 seg.summ <- function(data, groups) {
@@ -77,24 +91,25 @@ pca.8 <-fviz_cluster(WR.seg.8, WR.1df)
 pca.8
 
 WR.1$cluster <- WR.seg.8$cluster
-View(WR.1)
+
+WR.2 <- subset(WR.1, seasons != 0)
 
 # high DR, low TS, low BA
-# 8 
+# 
 # high DR, high TS, low BA
-# 2
+# 
 # high DR, low TS, high BA
-# 3
+# 
 # high DR, high TS, high BA 
-# 5
+# 
 # low DR, low TS, low BA
-# 7 
+#  
 # low DR, high TS, low BA
-# 6 
+#  
 # low DR, low TS, high BA
-# 4
+# 
 # low DR, high TS, high BA 
-# 1
+# 
 
 # function for averaging chosen stats by cluster 
 
@@ -112,16 +127,12 @@ aggregate(x = measure,
 
 # linear modeling
 
-metricsModel <- lm(rTargets ~ 0 + DR + TS + BA + highEnd + cluster, data = subset(WR.2, round == 3))
-summary(metricsModel)
+targetsModel <- lm(rTargets ~ 0 + DR + TS + BA + RAS + cluster + pick, data = WR.2)
+summary(targetsModel)
 
-metricsModelv2 <- lm(rTargets ~ 0 + DR + TS + BA + cluster, data = WR.2, subset = round)
-summary(metricsModelv2)
-# 99.9 R-squared??
-
-
-linear_rTargets <- function(DR, TS, BA, hEN, hEY, cluster) {
-  -2.8040*DR + 2.1592*TS + 0.4397*BA + 14.3876*hEN + 47.7590*hEY + 15.9283*cluster
+linear_rTargets <- function(DR, TS, BA, RAS, cluster, pick) {
+  -0.09447*DR + 0.16630*TS + 0.30112*BA + 6.03988*`RAS` + 1.80943*cluster + -0.16763*pick
 }
+
 
 

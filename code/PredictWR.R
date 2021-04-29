@@ -54,7 +54,7 @@ WR.1$predicted_rTargets <- linear_rTargets(WR.1$DR, WR.1$TS, WR.1$BA, WR.1$RAS, 
 WR.1$targetBinary <- WR.1$rTargets > WR.1$predicted_rTargets
 WR.1$targetComparison <- WR.1$rTargets - WR.1$predicted_rTargets
 
-#subset for analysis
+#subset for analysis of predicted vs actual targets and future production
 
 test_rTargets <- subset(WR.1, select = c('Player',
                                 'rTargets',
@@ -62,8 +62,7 @@ test_rTargets <- subset(WR.1, select = c('Player',
                                 'targetBinary',
                                 'targetComparison',
                                 'top12pt',
-                                'top24pt',
-                                'cluster'))
+                                'top24pt'))
 
 WR.2 <- subset(WR.1, seasons != 0)
 
@@ -133,6 +132,3 @@ summary(targetsModel)
 linear_rTargets <- function(DR, TS, BA, RAS, cluster, pick) {
   -0.09447*DR + 0.16630*TS + 0.30112*BA + 6.03988*`RAS` + 1.80943*cluster + -0.16763*pick
 }
-
-
-

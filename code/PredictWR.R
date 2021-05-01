@@ -50,21 +50,9 @@ WR.1$extraDR[WR.1$extraDR == "Yes"] <- 1
 
 WR.1$top12pt <- WR.1$top12 / WR.1$seasons
 WR.1$top24pt <- WR.1$top24 / WR.1$seasons
-WR.1$predicted_rTargets <- linear_rTargets(WR.1$DR, WR.1$TS, WR.1$BA, WR.1$RAS, WR.1$cluster, WR.1$pick)
-WR.1$targetBinary <- WR.1$rTargets > WR.1$predicted_rTargets
-WR.1$targetComparison <- WR.1$rTargets - WR.1$predicted_rTargets
-
-#subset for analysis of predicted vs actual targets and future production
-
-test_rTargets <- subset(WR.1, select = c('Player',
-                                'rTargets',
-                                'predicted_rTargets',
-                                'targetBinary',
-                                'targetComparison',
-                                'top12pt',
-                                'top24pt'))
 
 WR.2 <- subset(WR.1, seasons != 0)
+
 
 WR.1num <- subset(WR.1, select = c('DR',
                                    'TS', 
@@ -130,5 +118,19 @@ targetsModel <- lm(rTargets ~ 0 + DR + TS + BA + RAS + cluster + pick, data = WR
 summary(targetsModel)
 
 linear_rTargets <- function(DR, TS, BA, RAS, cluster, pick) {
-  -0.09447*DR + 0.16630*TS + 0.30112*BA + 6.03988*`RAS` + 1.80943*cluster + -0.16763*pick
+  0.02293*DR + 0.10669*TS + 0.24638*BA + 6.16691*`RAS` + 1.34014*cluster + -0.14563*pick
 }
+
+WR.1$predicted_rTargets <- linear_rTargets(WR.1$DR, WR.1$TS, WR.1$BA, WR.1$RAS, WR.1$cluster, WR.1$pick)
+WR.1$targetBinary <- WR.1$rTargets > WR.1$predicted_rTargets
+WR.1$targetComparison <- WR.1$rTargets - WR.1$predicted_rTargets
+
+#subset for analysis of predicted vs actual targets and future production
+
+test_rTargets <- subset(WR.1, select = c('Player',
+                                         'rTargets',
+                                         'predicted_rTargets',
+                                         'targetBinary',
+                                         'targetComparison',
+                                         'top12pt',
+                                         'top24pt'))
